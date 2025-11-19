@@ -1,0 +1,177 @@
+"use client";
+
+import { useMemo, useState, useEffect } from "react";
+import { type LucideIcon } from "lucide-react";
+import { type TimePeriod } from "@/lib/types";
+import { TimeFilter } from "@/components/TimeFilter";
+import {
+  customers, 
+  salesOrders, 
+  invoices, 
+  expenses, 
+  inventory, 
+  employees,
+  type Customer,
+  type SalesOrder,
+  type Invoice,
+  type Expense,
+  type InventoryItem,
+  type Employee
+} from "@/lib/mockData";
+import { worstProducts, worstEmployees, worstCustomers } from "@/lib/worstPerformersData";
+import { formatSAR, formatNumber } from "@/lib/format";
+import { getStartDate } from "@/lib/filterData";
+import { 
+  TrendingUp, 
+  TrendingDown, 
+  Users, 
+  ShoppingCart, 
+  DollarSign, 
+  Package, 
+  AlertTriangle, 
+  CheckCircle, 
+  Clock, 
+  Target,
+  Building2,
+  BarChart3,
+  PieChart,
+  Activity,
+  Zap,
+  Star,
+  Award,
+  Calendar,
+  ArrowUpRight,
+  ArrowDownRight,
+  Eye,
+  Filter,
+  RefreshCw
+} from "lucide-react";
+
+export default function DashboardPage() {
+  const [isClient, setIsClient] = useState(false);
+  const [selectedPeriod, setSelectedPeriod] = useState<TimePeriod>('month');
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  // Calculate metrics based on selected period
+  const metrics = useMemo(() => {
+    const startDate = getStartDate(selectedPeriod);
+    
+    const filteredInvoices = invoices.filter(invoice => 
+      new Date(invoice.date) >= startDate
+    );
+    
+    const filteredExpenses = expenses.filter(expense => 
+      new Date(expense.date) >= startDate
+    );
+    
+    const filteredSalesOrders = salesOrders.filter(order => 
+      new Date(order.date) >= startDate
+    );
+
+    const totalRevenue = filteredInvoices.reduce((sum, inv) => sum + inv.amount, 0);
+    const totalExpenses = filteredExpenses.reduce((sum, exp) => sum + exp.amount, 0);
+    const netProfit = totalRevenue - totalExpenses;
+    const ordersCount = filteredSalesOrders.length;
+    
+    // Calculate changes compared to previous period
+    const previousStartDate = new Date(startDate);
+    switch (selectedPeriod) {
+      case 'day':
+        previousStartDate.setDate(previousStartDate.getDate() - 1);
+        break;
+      case 'week':
+        previousStartDate.setDate(previousStartDate.getDate() - 7);
+        break;
+      case 'month':
+        previousStartDate.setMonth(previousStartDate.getMonth() - 1);
+        break;
+      case 'quarter':
+        previousStartDate.setMonth(previousStartDate.getMonth() - 3);
+        break;
+      case 'year':
+        previousStartDate.setFullYear(previousStartDate.getFullYear() - 1);
+        break;
+    }
+    
+    const previousInvoices = invoices.filter(invoice => 
+      new Date(invoice.date) >= previousStartDate && new Date(invoice.date) < startDate
+    );
+    
+    const previousRevenue = previousInvoices.reduce((sum, inv) => sum + inv.amount, 0);
+    const revenueChange = previousRevenue ? ((totalRevenue - previousRevenue) / previousRevenue) * 100 : 0;
+    
+    return {
+      totalRevenue,
+      totalExpenses,
+      netProfit,
+      ordersCount,
+      revenueChange: Math.round(revenueChange * 10) / 10 // Round to 1 decimal place
+    };
+  }, [selectedPeriod]);
+
+  const handleRefresh = () => {
+    setIsRefreshing(true);
+    setTimeout(() => {
+      setIsRefreshing(false);
+    }, 1000);
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Time Period Filter */}
+      <div className="flex justify-between items-center">
+        <TimeFilter
+          selectedPeriod={selectedPeriod}
+          onPeriodChange={(period) => {
+            setSelectedPeriod(period);
+            handleRefresh();
+          }}
+          onRefresh={handleRefresh}
+        />
+      </div>
+
+      {/* Top Level Metrics */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <KPICard
+          title="إجمالي المبيعات"
+          value={formatSAR(metrics.totalRevenue)}
+          change={metrics.revenueChange}
+          changeType={metrics.revenueChange >= 0 ? "positive" : "negative"}
+          icon={DollarSign}
+          color="bg-blue-500"
+        />
+        <KPICard
+          title="صافي الربح"
+          value={formatSAR(metrics.netProfit)}
+          change={4.3}
+          changeType="positive"
+          icon={TrendingUp}
+          color="bg-emerald-500"
+        />
+        <KPICard
+          title="المصروفات"
+          value={formatSAR(metrics.totalExpenses)}
+          change={2.1}
+          changeType="negative"
+          icon={TrendingDown}
+          color="bg-rose-500"
+        />
+        <KPICard
+          title="عدد الطلبات"
+          value={metrics.ordersCount.toString()}
+          change={12.5}
+          changeType="positive"
+          icon={ShoppingCart}
+          color="bg-purple-500"
+        />
+      </div>
+
+      {/* Rest of the dashboard components */}
+      {/* ... */}
+    </div>
+  );
+}
