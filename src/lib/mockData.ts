@@ -41,7 +41,14 @@ export type Customer = {
 };
 
 // Base customers without derived fields (50 records)
-const baseCustomers = [
+const baseCustomers: Array<{
+  name: string;
+  city: CustomerCity;
+  segment: CustomerSegment;
+  classification: CustomerClassification;
+  lastOrder: string;
+  credit: number;
+}> = [
   { name: "مستشفى الملك خالد", city: "الرياض", segment: "B2B", classification: "VIP", lastOrder: "2025-09-22", credit: 500000 },
   { name: "مدينة الملك فهد الطبية", city: "الرياض", segment: "B2B", classification: "High Value", lastOrder: "2025-09-18", credit: 420000 },
   { name: "مستشفى الملك عبدالعزيز", city: "جدة", segment: "B2B", classification: "High Value", lastOrder: "2025-09-25", credit: 380000 },
@@ -124,14 +131,14 @@ export const customers: Customer[] = baseCustomers.map((c, i) => {
 export type SupplierClassification = "Key" | "Critical" | "Regular";
 export type SupplierStatus = "Active" | "Suspended";
 export type SupplierCity = "الرياض" | "جدة" | "الدمام" | "مكة" | "دولي";
-export type ProductCategory = "أجهزة طبية" | "مستلزمات جراحية" | "أدوية" | "معدات تعقيم" | "قساطر" | "مختبرات";
+export type SupplierProductCategory = "أجهزة طبية" | "مستلزمات جراحية" | "أدوية" | "معدات تعقيم" | "قساطر" | "مختبرات";
 
 export type Supplier = {
   name: string;
   city: SupplierCity;
   classification: SupplierClassification;
   status: SupplierStatus;
-  productCategory: ProductCategory;
+  productCategory: SupplierProductCategory;
   contactName: string;
   contactPhone: string;
   totalPurchaseValue: number; // إجمالي قيمة أوامر الشراء
@@ -145,7 +152,18 @@ export type Supplier = {
 };
 
 // Base suppliers without derived fields (12 records)
-const baseSuppliers = [
+const baseSuppliers: Array<{
+  name: string;
+  city: SupplierCity;
+  classification: SupplierClassification;
+  status: SupplierStatus;
+  productCategory: SupplierProductCategory;
+  lastOrderDate: string;
+  creditLimit: number;
+  paymentTerms: string;
+  contractExpiry: string;
+  rating: number;
+}> = [
   { name: "MedTech GmbH", city: "دولي", classification: "Key", status: "Active", productCategory: "أجهزة طبية", lastOrderDate: "2025-09-20", creditLimit: 2000000, paymentTerms: "30 يوم", contractExpiry: "2026-12-31", rating: 4.6 },
   { name: "Global Sterile Solutions", city: "دولي", classification: "Critical", status: "Active", productCategory: "معدات تعقيم", lastOrderDate: "2025-09-18", creditLimit: 1500000, paymentTerms: "45 يوم", contractExpiry: "2026-06-30", rating: 4.1 },
   { name: "Alpha Medical Devices", city: "دولي", classification: "Key", status: "Active", productCategory: "قساطر", lastOrderDate: "2025-09-25", creditLimit: 1800000, paymentTerms: "30 يوم", contractExpiry: "2027-03-15", rating: 4.8 },
@@ -229,7 +247,33 @@ export type InventoryItem = {
 };
 
 // Base inventory items (50+ records with enhanced fields)
-const baseInventoryItems = [
+const baseInventoryItems: Array<{
+  id: string;
+  product: string;
+  category: ProductCategory;
+  batch: string;
+  expiry: string;
+  currentStock: number;
+  reorderPoint: number;
+  maxStock: number;
+  unitCost: number;
+  branch: Branch;
+  lastRestocked: string;
+  supplier: string;
+  critical: boolean;
+  sku: string;
+  barcode: string;
+  warehouse: string;
+  bin: string;
+  lastMovement: string;
+  avgCost: number;
+  sellingPrice: number;
+  condition: "سليم" | "تالف" | "منتهي الصلاحية" | "مشكوك فيه";
+  minOrderQty: number;
+  leadTime: number;
+  supplierContact: string;
+  notes: string;
+}> = [
   { id: "INV-001", product: "قفازات فحص نيتريل", category: "مستهلكات طبية", batch: "BN-7843", expiry: "2026-01-15", currentStock: 12500, reorderPoint: 5000, maxStock: 20000, unitCost: 2.5, branch: "الرياض", lastRestocked: "2025-09-15", supplier: "المستلزمات الحديثة", critical: false, sku: "SKU-001", barcode: "1234567890123", warehouse: "مخزن الرياض الرئيسي", bin: "A-01-15", lastMovement: "2025-09-15", avgCost: 2.3, sellingPrice: 3.5, condition: "سليم", minOrderQty: 1000, leadTime: 7, supplierContact: "أحمد محمد - 0501234567", notes: "مطلوب بشدة - زيادة الطلب" },
   { id: "INV-002", product: "كمامات جراحية", category: "مستهلكات طبية", batch: "MS-2210", expiry: "2025-12-01", currentStock: 54000, reorderPoint: 10000, maxStock: 80000, unitCost: 1.8, branch: "جدة", lastRestocked: "2025-09-20", supplier: "شركة الشرق للمستلزمات الطبية", critical: false, sku: "SKU-002", barcode: "1234567890124", warehouse: "مخزن جدة الفرعي", bin: "B-02-20", lastMovement: "2025-09-20", avgCost: 1.6, sellingPrice: 2.8, condition: "سليم", minOrderQty: 5000, leadTime: 5, supplierContact: "سارة أحمد - 0502345678", notes: "جودة عالية - موافقة إدارة الجودة" },
   { id: "INV-003", product: "محاليل تعقيم", category: "معدات تعقيم", batch: "ST-9331", expiry: "2025-11-10", currentStock: 3800, reorderPoint: 2000, maxStock: 10000, unitCost: 15.0, branch: "الدمام", lastRestocked: "2025-09-10", supplier: "Global Sterile Solutions", critical: true, sku: "SKU-003", barcode: "1234567890125", warehouse: "مخزن الدمام الطبي", bin: "C-03-10", lastMovement: "2025-09-10", avgCost: 14.5, sellingPrice: 22.0, condition: "سليم", minOrderQty: 500, leadTime: 10, supplierContact: "John Smith - +966501234567", notes: "حرج - يحتاج مراقبة مستمرة" },
@@ -431,7 +475,18 @@ export type Invoice = {
 };
 
 // Base sales orders (25 records)
-const baseSalesOrders = [
+const baseSalesOrders: Array<{
+  id: string;
+  customer: string;
+  customerClassification: "VIP" | "High Value" | "Risk";
+  salesRep: SalesRep;
+  status: SalesOrderStatus;
+  total: number;
+  orderDate: string;
+  deliveryDate: string;
+  items: number;
+  branch: "الرياض" | "جدة" | "الدمام" | "مكة";
+}> = [
   { id: "SO-10041", customer: "مستشفى الملك خالد", customerClassification: "VIP", salesRep: "أحمد الشمري", status: "قيد التنفيذ", total: 185000, orderDate: "2025-09-22", deliveryDate: "2025-09-30", items: 12, branch: "الرياض" },
   { id: "SO-10042", customer: "مركز الشفاء الطبي", customerClassification: "High Value", salesRep: "سارة النعيمي", status: "مكتمل", total: 42000, orderDate: "2025-09-18", deliveryDate: "2025-09-25", items: 8, branch: "جدة" },
   { id: "SO-10043", customer: "عيادة الندى", customerClassification: "High Value", salesRep: "محمد العتيبي", status: "بانتظار التسليم", total: 15500, orderDate: "2025-09-20", deliveryDate: "2025-09-28", items: 5, branch: "الدمام" },
@@ -463,7 +518,7 @@ export const salesOrders: SalesOrder[] = baseSalesOrders.map((order) => {
   const isVip = order.customerClassification === "VIP";
   const isRisk = order.customerClassification === "Risk";
   const profitMargin = isVip ? 0.25 + (Math.random() * 0.1) : isRisk ? 0.15 + (Math.random() * 0.05) : 0.20 + (Math.random() * 0.08);
-  return { ...order, profitMargin: Math.round(profitMargin * 100) / 100 };
+  return { ...(order as unknown as SalesOrder), profitMargin: Math.round(profitMargin * 100) / 100 } as SalesOrder;
 });
 
 // Base invoices (30 records)
@@ -504,7 +559,7 @@ export const invoices: Invoice[] = baseInvoices.map((invoice) => {
   const today = new Date();
   const dueDate = new Date(invoice.dueDate);
   const overdueDays = Math.max(0, Math.floor((today.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24)));
-  return { ...invoice, overdueDays };
+  return { ...(invoice as unknown as Invoice), overdueDays } as Invoice;
 });
 
 // Monthly Sales Trend Data (12 months)
@@ -595,6 +650,7 @@ export const notifications = [
 // Employees mock data
 export type EmployeeStatus = "نشط" | "إجازة";
 export type Employee = {
+  id: string;
   name: string;
   title: string;
   department: string;
@@ -615,7 +671,7 @@ export const employees: Employee[] = Array.from({ length: 50 }).map((_, i) => {
   const month = ((i % 12) + 1).toString().padStart(2, "0");
   const day = ((i % 28) + 1).toString().padStart(2, "0");
   const joined = `2024-${month}-${day}`;
-  return { name, title, department, salary, status, joined };
+  return { id: `EMP-${String(i + 1).padStart(4, '0')}`, name, title, department, salary, status, joined };
 });
 
 // Expense Types

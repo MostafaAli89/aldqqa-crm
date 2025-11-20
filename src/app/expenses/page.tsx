@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ChangeEvent } from "react";
 import { expenses, monthlyBudgets, type Expense, type ExpenseCategory, type ExpenseStatus } from "@/lib/mockData";
 import { formatSAR, formatNumber } from "@/lib/format";
 import { Eye, Trash2, Pencil, Plus } from "lucide-react";
@@ -471,7 +471,7 @@ export default function Page() {
                     </div>
                     <div className="flex flex-col gap-1">
                       <label className="text-xs text-muted-foreground">القناة</label>
-                      <select className="px-3 py-2 rounded-md border border-border bg-card" value={editingExpense.channel} onChange={(e) => setEditingExpense(prev => prev ? { ...prev, channel: e.target.value as any } : prev)} required>
+                      <select className="px-3 py-2 rounded-md border border-border bg-card" value={editingExpense.channel} onChange={(e: ChangeEvent<HTMLSelectElement>) => setEditingExpense(prev => prev ? { ...prev, channel: e.target.value as Expense["channel"] } : prev)} required>
                         <option value="نقدي">نقدي</option>
                         <option value="تحويل بنكي">تحويل بنكي</option>
                         <option value="بطاقة ائتمان">بطاقة ائتمان</option>

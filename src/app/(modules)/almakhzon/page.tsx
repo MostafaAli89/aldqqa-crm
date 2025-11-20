@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, type ChangeEvent } from "react";
 import { inventory, inventoryCategories, inventoryMovements, type InventoryItem, type InventoryMovement } from "@/lib/mockData";
 import { formatNumber, formatSAR } from "@/lib/format";
 import { 
@@ -1040,7 +1040,7 @@ export default function Page() {
                   <label className="block text-sm font-medium text-foreground mb-1">التصنيف</label>
                   <select
                     value={editingItem.category}
-                    onChange={(e) => setEditingItem({ ...editingItem, category: e.target.value as any })}
+                    onChange={(e: ChangeEvent<HTMLSelectElement>) => setEditingItem({ ...editingItem, category: e.target.value as InventoryItem["category"] })}
                     className="w-full px-3 py-2 rounded-md border border-border bg-input text-sm"
                   >
                     {uniqueCategories.map(category => (

@@ -54,7 +54,8 @@ function KPICard({
   changeType, 
   icon: Icon, 
   color = "bg-blue-500",
-  subtitle
+  subtitle,
+  onClick
 }: { 
   title: string;
   value: string;
@@ -63,6 +64,7 @@ function KPICard({
   icon: LucideIcon;
   color?: string;
   subtitle?: string;
+  onClick?: () => void;
 }) {
   const getChangeBg = () => changeType === "positive" ? "bg-emerald-50" : "bg-rose-50";
   const getChangeColor = () => changeType === "positive" ? "text-emerald-600" : "text-rose-600";
@@ -70,7 +72,7 @@ function KPICard({
   const getSubtitleColor = () => "text-muted-foreground";
 
   return (
-    <div className="group p-6 rounded-xl border-0 bg-gradient-to-br hover:shadow-xl active:scale-95 hover:scale-105 cursor-pointer transform transition-all duration-200 ease-in-out" style={{
+    <div onClick={onClick} className="group p-6 rounded-xl border-0 bg-gradient-to-br hover:shadow-xl active:scale-95 hover:scale-105 cursor-pointer transform transition-all duration-200 ease-in-out" style={{
         background: color === 'bg-blue-500' ? 'linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(37, 99, 235, 0.03) 100%)' :
                    color === 'bg-green-500' ? 'linear-gradient(135deg, rgba(34, 197, 94, 0.08) 0%, rgba(22, 163, 74, 0.03) 100%)' :
                    color === 'bg-purple-500' ? 'linear-gradient(135deg, rgba(168, 85, 247, 0.08) 0%, rgba(147, 51, 234, 0.03) 100%)' :
@@ -318,7 +320,16 @@ function BestBranchDetails({ data }: { data: { branch: string; revenue: number; 
   );
 }
 
-function TopPerformers({ title, data, type }: { title: string; data: any[]; type: "employees" | "customers" | "products" }) {
+interface Performer {
+  name: string;
+  department?: string;
+  city?: string;
+  category?: string;
+  value: number;
+  label: string;
+}
+
+function TopPerformers({ title, data, type }: { title: string; data: Performer[]; type: "employees" | "customers" | "products" }) {
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-semibold">{title}</h3>
@@ -352,7 +363,7 @@ function TopPerformers({ title, data, type }: { title: string; data: any[]; type
   );
 }
 
-function WorstPerformers({ title, data, type }: { title: string; data: any[]; type: "employees" | "customers" | "products" }) {
+function WorstPerformers({ title, data, type }: { title: string; data: Performer[]; type: "employees" | "customers" | "products" }) {
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-semibold text-rose-600 dark:text-rose-300">{title}</h3>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { salesOrders, invoices, monthlySalesTrend, type SalesOrder, type Invoice } from "@/lib/mockData";
+import { salesOrders, invoices, monthlySalesTrend, customers, type SalesOrder, type Invoice, type Customer } from "@/lib/mockData";
 import { formatNumber, formatSAR } from "@/lib/format";
 import { 
   ShoppingCart, 

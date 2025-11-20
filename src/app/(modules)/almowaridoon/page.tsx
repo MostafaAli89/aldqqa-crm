@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ChangeEvent } from "react";
 import { suppliers, type Supplier } from "@/lib/mockData";
 import { formatNumber, formatSAR } from "@/lib/format";
 import { 
@@ -702,7 +702,7 @@ export default function Page() {
                 </div>
                 <div className="flex flex-col gap-1">
                   <label className="text-xs text-muted-foreground">المدينة</label>
-                  <select className="px-3 py-2 rounded-md border border-border bg-card" value={editingSupplier.city} onChange={(e) => setEditingSupplier(prev => prev ? { ...prev, city: e.target.value as any } as Supplier : prev)} required>
+                  <select className="px-3 py-2 rounded-md border border-border bg-card" value={editingSupplier.city} onChange={(e: ChangeEvent<HTMLSelectElement>) => setEditingSupplier(prev => prev ? { ...prev, city: e.target.value } as Supplier : prev)} required>
                     <option value="الرياض">الرياض</option>
                     <option value="جدة">جدة</option>
                     <option value="الدمام">الدمام</option>
@@ -712,7 +712,7 @@ export default function Page() {
                 </div>
                 <div className="flex flex-col gap-1">
                   <label className="text-xs text-muted-foreground">التصنيف</label>
-                  <select className="px-3 py-2 rounded-md border border-border bg-card" value={editingSupplier.classification} onChange={(e) => setEditingSupplier(prev => prev ? { ...prev, classification: e.target.value as any } as Supplier : prev)} required>
+                  <select className="px-3 py-2 rounded-md border border-border bg-card" value={editingSupplier.classification} onChange={(e: ChangeEvent<HTMLSelectElement>) => setEditingSupplier(prev => prev ? { ...prev, classification: e.target.value } as Supplier : prev)} required>
                     <option value="Key">Key</option>
                     <option value="Critical">Critical</option>
                     <option value="Regular">Regular</option>
@@ -720,14 +720,14 @@ export default function Page() {
                 </div>
                 <div className="flex flex-col gap-1">
                   <label className="text-xs text-muted-foreground">الحالة</label>
-                  <select className="px-3 py-2 rounded-md border border-border bg-card" value={editingSupplier.status} onChange={(e) => setEditingSupplier(prev => prev ? { ...prev, status: e.target.value as any } as Supplier : prev)} required>
+                  <select className="px-3 py-2 rounded-md border border-border bg-card" value={editingSupplier.status} onChange={(e: ChangeEvent<HTMLSelectElement>) => setEditingSupplier(prev => prev ? { ...prev, status: e.target.value } as Supplier : prev)} required>
                     <option value="Active">نشط</option>
                     <option value="Suspended">معلق</option>
                   </select>
                 </div>
                 <div className="flex flex-col gap-1">
                   <label className="text-xs text-muted-foreground">فئة المنتج</label>
-                  <select className="px-3 py-2 rounded-md border border-border bg-card" value={editingSupplier.productCategory} onChange={(e) => setEditingSupplier(prev => prev ? { ...prev, productCategory: e.target.value as any } as Supplier : prev)} required>
+                  <select className="px-3 py-2 rounded-md border border-border bg-card" value={editingSupplier.productCategory} onChange={(e: ChangeEvent<HTMLSelectElement>) => setEditingSupplier(prev => prev ? { ...prev, productCategory: e.target.value } as Supplier : prev)} required>
                     <option value="أجهزة طبية">أجهزة طبية</option>
                     <option value="مستلزمات جراحية">مستلزمات جراحية</option>
                     <option value="أدوية">أدوية</option>

@@ -1,28 +1,143 @@
 "use client";
 
-"use client";
-
 import { useMemo } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { computeBranchKpis, formatCurrency } from "@/lib/branches";
-import { invoices, inventory, salesOrders } from "@/lib/mockData";
 
+import { computeBranchKpis, formatCurrency } from "@/lib/branches";
+import { invoices, salesOrders, inventory, Invoice } from "@/lib/mockData";
+
+// **الجزء المُصحَّح 1: تعريف نوع البيانات**
+interface TopProduct {
+  product: string;
+  category: string;
+  estimatedValue: number;
+}
+// ------------------------------------
+// ^^^ تم إضافة 'Invoice' هنا لتحديد نوع البيانات في الدوال المساعدة
+
+// --- دوال مساعدة مُضافة ومُصححة ---
+function sum(arr: number[]) { return arr.reduce((a, b) => a + b, 0); }
+
+function getLastNMonths(n: number) {
+  const months: { key: string; label: string }[] = [];
+  const now = new Date();
+  for (let i = n - 1; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+    const monthNames = ["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
+    months.push({ key, label: `${monthNames[d.getMonth()]}` });
+  }
+  return months;
+}
+
+function getYearMonths(year: number) {
+  const res: { key: string; label: string; labelShort: string }[] = [];
+  const names = ["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
+  for (let m = 0; m < 12; m++) {
+    const key = `${year}-${String(m + 1).padStart(2, "0")}`;
+    res.push({ key, label: `${names[m]} ${year}`, labelShort: names[m] });
+  }
+  return res;
+}
+
+function groupMonthlyRevenue(branch: string, months: { key: string }[]) {
+    return months.map(({ key }) => 
+        invoices.filter(inv => inv.branch === branch && inv.invoiceDate.slice(0, 7) === key).reduce((s, inv) => s + inv.amount, 0)
+    );
+}
+
+function expensesForMonth(keyYYYYMM: string) {
+  const monthRevenue = invoices.filter(inv => inv.invoiceDate.slice(0, 7) === keyYYYYMM).reduce((s, inv) => s + inv.amount, 0);
+  const totalRevenue = invoices.reduce((s, inv) => s + inv.amount, 0);
+  const totalExpensesApprox = Math.round(totalRevenue * 0.35); 
+  const monthShare = totalRevenue > 0 ? monthRevenue / totalRevenue : 0;
+  return Math.round(totalExpensesApprox * monthShare);
+}
+
+function groupMonthlyExpensesAllocated(branch: string, months: { key: string }[]) {
+  return months.map(({ key }) => {
+    const byBranch: Record<string, number> = { "الرياض": 0, "مكة": 0, "الدمام": 0, "جدة": 0 };
+    for (const inv of invoices) {
+      if (inv.invoiceDate.slice(0, 7) === key) {
+        byBranch[inv.branch] = (byBranch[inv.branch] || 0) + inv.amount;
+      }
+    }
+    const totalMonthExpenses = expensesForMonth(key);
+    const totalMonthRevenue = Object.values(byBranch).reduce((a, b) => a + b, 0);
+    const share = totalMonthRevenue > 0 ? (byBranch[branch] || 0) / totalMonthRevenue : 0;
+    return Math.round(totalMonthExpenses * share);
+  });
+}
+
+function computeMonthlyNetProfit(branch: string, months: { key: string }[]) {
+  return months.map(({ key }) => {
+    const rev = invoices.filter(inv => inv.branch === branch && inv.invoiceDate.slice(0, 7) === key).reduce((s, inv) => s + inv.amount, 0);
+    const exp = groupMonthlyExpensesAllocated(branch, [{ key }])[0];
+    return rev - exp;
+  });
+}
+
+function computeBenchmark(all: ReturnType<typeof computeBranchKpis>) {
+  const year = new Date().getFullYear();
+  const months = getYearMonths(year);
+  const nets = all.map(b => sum(computeMonthlyNetProfit(b.branch, months)));
+  const avgNetProfitYtd = Math.round(nets.reduce((a, b) => a + b, 0) / Math.max(1, nets.length));
+  return { avgNetProfitYtd };
+}
+
+// **الجزء المُصحَّح 2: تحديد نوع القيمة المرجعة (TopProduct[]) وحل مشكلة any**
+interface InventoryItem {
+    branch: string;
+    product: string;
+    category: string;
+    currentStock: number;
+    sellingPrice: number;
+}
+
+function topProductsByInventoryValue(branch: string, topN: number): TopProduct[] {
+  return (inventory as InventoryItem[]) 
+    .filter((item: InventoryItem) => item.branch === branch)
+    .map((item: InventoryItem): TopProduct => ({ product: item.product, category: item.category, estimatedValue: Math.round(item.currentStock * item.sellingPrice) }))
+    .sort((a: TopProduct, b: TopProduct) => b.estimatedValue - a.estimatedValue) 
+    .slice(0, topN);
+}
+
+// **الجزء المُصحَّح 3: تحديد نوع القيمة المرجعة (EmployeeStats[]) وحل مشكلة any**
+interface EmployeeStats {
+    salesRep: string;
+    total: number;
+    orders: number;
+}
+interface SalesOrder {
+    branch: string;
+    salesRep: string;
+    total: number;
+    orderDate: string;
+    // ... باقي الخصائص
+}
+
+function topEmployeesBySales(branch: string, topN: number): EmployeeStats[] {
+  const map = new Map<string, { total: number; orders: number }>();
+  // تم استخدام 'salesOrders as SalesOrder[]' لضمان التعامل معها كنوع معرف
+  for (const so of (salesOrders as SalesOrder[])) {
+    if (so.branch === branch) {
+      const e = map.get(so.salesRep) || { total: 0, orders: 0 };
+      e.total += so.total;
+      e.orders += 1;
+      map.set(so.salesRep, e);
+    }
+  }
+  return Array.from(map.entries()).map(([salesRep, v]): EmployeeStats => ({ salesRep, total: v.total, orders: v.orders })).sort((a,b) => b.total - a.total).slice(0, topN);
+}
+
+// --- المكون الرئيسي ---
 export default function BranchDetailsPage() {
   const params = useParams<{ branch: string }>();
   const branchName = decodeURIComponent(params.branch || "");
+
+  // ************* تم نقل جميع useMemo إلى هنا (لحل مشكلة Conditional Hooks) *************
   const kpis = useMemo(() => computeBranchKpis(), []);
-  const k = kpis.find((x) => x.branch === branchName);
-
-  if (!k) {
-    return (
-      <div className="flex flex-col gap-4">
-        <div className="text-lg">لم يتم العثور على الفرع</div>
-        <Link href="/branches" className="inline-flex px-3 py-1.5 rounded border border-border hover:bg-muted w-fit">عودة للفروع</Link>
-      </div>
-    );
-  }
-
   const last6Months = useMemo(() => getLastNMonths(6), []);
   const currentYearMonths = useMemo(() => getYearMonths(new Date().getFullYear()), []);
 
@@ -34,6 +149,19 @@ export default function BranchDetailsPage() {
 
   const topProducts = useMemo(() => topProductsByInventoryValue(branchName, 5), [branchName]);
   const topEmployees = useMemo(() => topEmployeesBySales(branchName, 5), [branchName]);
+  // **********************************************************************************
+
+  // الآن، يتم التحقق الشرطي بعد استدعاء جميع الـ Hooks
+  const k = kpis.find((x) => x.branch === branchName); 
+  
+  if (!k) {
+    return (
+      <div className="flex flex-col gap-4">
+        <div className="text-lg">لم يتم العثور على الفرع</div>
+        <Link href="/branches" className="inline-flex px-3 py-1.5 rounded border border-border hover:bg-muted w-fit">عودة للفروع</Link>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -94,7 +222,8 @@ export default function BranchDetailsPage() {
               </tr>
             </thead>
             <tbody>
-              {topProducts.map((p, i) => (
+              {/* لم يتم تغيير هذا الجزء لأنه أصبح صحيحاً الآن */}
+              {topProducts.map((p, i) => ( 
                 <tr key={i} className="border-t border-border">
                   <td className="p-2">{p.product}</td>
                   <td className="p-2">{p.category}</td>
@@ -130,6 +259,7 @@ export default function BranchDetailsPage() {
   );
 }
 
+// الدوال المساعدة للرسومات البيانية (كما هي)
 function MetricCard({ title, value, accent }: { title: string; value: string; accent: string }) {
   return (
     <div className={`rounded-xl border border-border bg-card p-4 shadow-sm transition-transform hover:-translate-y-0.5 hover:shadow-md bg-gradient-to-br ${accent}`}>
@@ -288,91 +418,3 @@ function SimpleBarChart({ labels, data, height = 220 }: { labels: string[]; data
     </div>
   );
 }
-
-// Data helpers (scoped here for simplicity)
-function getLastNMonths(n: number) {
-  const months: { key: string; label: string }[] = [];
-  const now = new Date();
-  for (let i = n - 1; i >= 0; i--) {
-    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
-    const monthNames = ["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
-    months.push({ key, label: `${monthNames[d.getMonth()]}` });
-  }
-  return months;
-}
-function getYearMonths(year: number) {
-  const res: { key: string; label: string; labelShort: string }[] = [];
-  const names = ["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
-  for (let m = 0; m < 12; m++) {
-    const key = `${year}-${String(m + 1).padStart(2, "0")}`;
-    res.push({ key, label: `${names[m]} ${year}`, labelShort: names[m] });
-  }
-  return res;
-}
-function groupMonthlyRevenue(branch: string, months: { key: string }[]) {
-  return months.map(({ key }) => invoices.filter(inv => inv.branch === branch && inv.invoiceDate.slice(0,7) === key).reduce((s, inv) => s + inv.amount, 0));
-}
-function groupMonthlyExpensesAllocated(branch: string, months: { key: string }[]) {
-  return months.map(({ key }) => {
-    const byBranch: Record<string, number> = { "الرياض": 0, "مكة": 0, "الدمام": 0, "جدة": 0 };
-    // revenue per branch for that month
-    for (const inv of invoices) {
-      if (inv.invoiceDate.slice(0,7) === key) {
-        byBranch[inv.branch] = (byBranch[inv.branch] || 0) + inv.amount;
-      }
-    }
-    const totalMonthExpenses = expensesForMonth(key);
-    const totalMonthRevenue = Object.values(byBranch).reduce((a,b) => a+b, 0);
-    const share = totalMonthRevenue > 0 ? (byBranch[branch] || 0) / totalMonthRevenue : 0;
-    return Math.round(totalMonthExpenses * share);
-  });
-}
-function expensesForMonth(keyYYYYMM: string) {
-  // approximate: use all expenses whose expenseDate is that month
-  // expenses are imported via mockData at runtime in root page; re-import here would bloat, so compute from invoices proportionately using overall totals for simplicity
-  // For a closer approximation, sum expenses array; but not imported here. We'll estimate month expense as proportion of invoices for month vs total invoices
-  const monthRevenue = invoices.filter(inv => inv.invoiceDate.slice(0,7) === keyYYYYMM).reduce((s, inv) => s + inv.amount, 0);
-  const totalRevenue = invoices.reduce((s, inv) => s + inv.amount, 0);
-  // total expenses overall approximated via salesOrders profit margin not accessible here; fallback to  sum of expenses proxy: 35% of total invoices value
-  const totalExpensesApprox = Math.round(totalRevenue * 0.35);
-  const monthShare = totalRevenue > 0 ? monthRevenue / totalRevenue : 0;
-  return Math.round(totalExpensesApprox * monthShare);
-}
-function computeMonthlyNetProfit(branch: string, months: { key: string }[]) {
-  return months.map(({ key }) => {
-    const rev = invoices.filter(inv => inv.branch === branch && inv.invoiceDate.slice(0,7) === key).reduce((s, inv) => s + inv.amount, 0);
-    const exp = groupMonthlyExpensesAllocated(branch, [{ key }])[0];
-    return rev - exp;
-  });
-}
-function computeBenchmark(all: ReturnType<typeof computeBranchKpis>) {
-  // YTD net profit per branch
-  const year = new Date().getFullYear();
-  const months = getYearMonths(year);
-  const nets = all.map(b => sum(computeMonthlyNetProfit(b.branch, months)));
-  const avgNetProfitYtd = Math.round(nets.reduce((a,b) => a+b, 0) / Math.max(1, nets.length));
-  return { avgNetProfitYtd };
-}
-function topProductsByInventoryValue(branch: string, topN: number) {
-  return inventory
-    .filter(item => item.branch === (branch as any))
-    .map(item => ({ product: item.product, category: item.category, estimatedValue: Math.round(item.currentStock * item.sellingPrice) }))
-    .sort((a, b) => b.estimatedValue - a.estimatedValue)
-    .slice(0, topN);
-}
-function topEmployeesBySales(branch: string, topN: number) {
-  const map = new Map<string, { total: number; orders: number }>();
-  for (const so of salesOrders) {
-    if (so.branch === (branch as any)) {
-      const e = map.get(so.salesRep) || { total: 0, orders: 0 };
-      e.total += so.total;
-      e.orders += 1;
-      map.set(so.salesRep, e);
-    }
-  }
-  return Array.from(map.entries()).map(([salesRep, v]) => ({ salesRep, total: v.total, orders: v.orders })).sort((a,b) => b.total - a.total).slice(0, topN);
-}
-function sum(arr: number[]) { return arr.reduce((a,b) => a + b, 0); }
-
-

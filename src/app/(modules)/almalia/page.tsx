@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ChangeEvent } from "react";
 import { invoices, monthlySalesTrend, inventoryCategories, type Invoice, type PaymentStatus } from "@/lib/mockData";
 import { formatSAR, formatNumber } from "@/lib/format";
 import { Eye, Download as DownloadIcon, Receipt, Trash2, Pencil } from "lucide-react";
@@ -630,11 +630,11 @@ export default function Page() {
                 </div>
                 <div className="flex flex-col gap-1">
                   <label className="text-xs text-muted-foreground">مندوب المبيعات</label>
-                  <input className="px-3 py-2 rounded-md border border-border bg-card" value={editingInvoice.salesRep} onChange={(e) => setEditingInvoice(prev => prev ? { ...prev, salesRep: e.target.value as any } as Invoice : prev)} />
+                  <input className="px-3 py-2 rounded-md border border-border bg-card" value={editingInvoice.salesRep} onChange={(e: ChangeEvent<HTMLInputElement>) => setEditingInvoice(prev => prev ? { ...prev, salesRep: e.target.value } as Invoice : prev)} />
                 </div>
                 <div className="flex flex-col gap-1">
                   <label className="text-xs text-muted-foreground">الفرع</label>
-                  <select className="px-3 py-2 rounded-md border border-border bg-card" value={editingInvoice.branch} onChange={(e) => setEditingInvoice(prev => prev ? { ...prev, branch: e.target.value as any } as Invoice : prev)}>
+                  <select className="px-3 py-2 rounded-md border border-border bg-card" value={editingInvoice.branch} onChange={(e: ChangeEvent<HTMLSelectElement>) => setEditingInvoice(prev => prev ? { ...prev, branch: e.target.value } as Invoice : prev)}>
                     <option value="الرياض">الرياض</option>
                     <option value="جدة">جدة</option>
                     <option value="الدمام">الدمام</option>

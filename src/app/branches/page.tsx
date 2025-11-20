@@ -45,8 +45,9 @@ export default function BranchesPage() {
   const clients = kpis.map((k) => ({ name: k.branch, value: k.clientsCount }));
 
   const totalBranches = branches.length;
-  const activeBranches = branches.filter(b => b.status === 'active').length;
-  const totalRevenue = kpis.reduce((sum, k) => sum + k.revenue, 0);
+  // profiles contains branch metadata — use its length for active branches count
+  const activeBranches = profiles.length;
+  const totalRevenue = kpis.reduce((sum, k) => sum + k.totalRevenue, 0);
   const totalProfit = kpis.reduce((sum, k) => sum + k.netProfit, 0);
   const avgOrderValue = Object.values(avgOrder).reduce((sum, val) => sum + val, 0) / totalBranches;
   const avgTargetAchievement = Object.values(targetRate).reduce((sum, val) => sum + val, 0) / totalBranches;
@@ -440,7 +441,7 @@ function BranchModal({ title, onClose, onSubmit, initial }: { title: string; onC
   const [data, setData] = useState<BranchModalData>(initial || {});
   const [activeTab, setActiveTab] = useState<'basic' | 'contact' | 'financial' | 'operational'>('basic');
   
-  const tabs = [
+  const tabs: { id: 'basic' | 'contact' | 'financial' | 'operational'; label: string; icon: string }[] = [
     { id: 'basic', label: 'المعلومات الأساسية', icon: '📋' },
     { id: 'contact', label: 'معلومات الاتصال', icon: '📞' },
     { id: 'financial', label: 'المعلومات المالية', icon: '💰' },
@@ -470,7 +471,7 @@ function BranchModal({ title, onClose, onSubmit, initial }: { title: string; onC
           {tabs.map((tab) => (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id as any)}
+              onClick={() => setActiveTab(tab.id)}
               className={`flex-1 px-3 py-2 rounded-md text-sm font-medium transition ${
                 activeTab === tab.id 
                   ? "bg-white shadow-sm" 
