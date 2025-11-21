@@ -421,43 +421,43 @@ export default function Page() {
           ))}
         </div>
       ) : (
-        <div className="overflow-auto rounded-xl border border-border bg-card">
+        <div className="overflow-x-auto rounded-xl border border-border bg-card">
           <table className="w-full text-sm">
             <thead className="bg-muted text-muted-foreground">
               <tr>
-                <th className="p-3 text-right">الاسم</th>
-                <th className="p-3 text-right">المدينة</th>
-                <th className="p-3 text-right">التصنيف</th>
-                <th className="p-3 text-right">الحالة</th>
-                <th className="p-3 text-right">فئة المنتج</th>
-                <th className="p-3 text-right">إجمالي المشتريات</th>
-                <th className="p-3 text-right">حد الائتمان</th>
-                <th className="p-3 text-right">التقييم</th>
-                <th className="p-3 text-right">آخر طلبية</th>
-                <th className="p-3 text-right">إجراءات سريعة</th>
+                <th className="p-2 sm:p-3 text-right">الاسم</th>
+                <th className="p-2 sm:p-3 text-right">المدينة</th>
+                <th className="p-2 sm:p-3 text-right">التصنيف</th>
+                <th className="p-2 sm:p-3 text-right">الحالة</th>
+                <th className="p-2 sm:p-3 text-right">فئة المنتج</th>
+                <th className="p-2 sm:p-3 text-right">إجمالي المشتريات</th>
+                <th className="p-2 sm:p-3 text-right">حد الائتمان</th>
+                <th className="p-2 sm:p-3 text-right">التقييم</th>
+                <th className="p-2 sm:p-3 text-right">آخر طلبية</th>
+                <th className="p-2 sm:p-3 text-right">إجراءات سريعة</th>
               </tr>
             </thead>
             <tbody>
               {paged.map((s, i) => (
                 <tr key={i} className="border-t border-border">
-                  <td className="p-3">{s.name}</td>
-                  <td className="p-3">{s.city}</td>
-                  <td className="p-3">
+                  <td className="p-2 sm:p-3">{s.name}</td>
+                  <td className="p-2 sm:p-3">{s.city}</td>
+                  <td className="p-2 sm:p-3">
                     <span className={`px-2 py-1 text-[11px] rounded-md border ${classificationTag(s.classification)}`}>
                       {s.classification}
                     </span>
                   </td>
-                  <td className="p-3">
+                  <td className="p-2 sm:p-3">
                     <span className={`px-2 py-1 text-[11px] rounded-md border ${statusTag(s.status)}`}>
                       {s.status === "Active" ? "نشط" : "معلق"}
                     </span>
                   </td>
-                  <td className="p-3">{s.productCategory}</td>
-                  <td className="p-3">{formatSAR(s.totalPurchaseValue)}</td>
-                  <td className="p-3">{formatSAR(s.creditLimit)}</td>
-                  <td className="p-3">{s.rating.toFixed(1)}</td>
-                  <td className="p-3">{s.lastOrderDate}</td>
-                  <td className="p-3">
+                  <td className="p-2 sm:p-3">{s.productCategory}</td>
+                  <td className="p-2 sm:p-3">{formatSAR(s.totalPurchaseValue)}</td>
+                  <td className="p-2 sm:p-3">{formatSAR(s.creditLimit)}</td>
+                  <td className="p-2 sm:p-3">{s.rating.toFixed(1)}</td>
+                  <td className="p-2 sm:p-3">{s.lastOrderDate}</td>
+                  <td className="p-2 sm:p-3">
                     <div className="flex items-center gap-2">
                       <button
                         className="p-1.5 rounded-md border border-sky-400/40 text-sky-600 dark:text-sky-300 hover:bg-sky-500/10"
@@ -489,7 +489,7 @@ export default function Page() {
             </tbody>
           </table>
           {/* Pagination Component */}
-          <div className="flex items-center justify-between p-3 border-t border-border">
+          <div className="flex items-center justify-between p-2 sm:p-3 border-t border-border">
             <div className="text-sm text-muted-foreground">
               عرض {formatNumber(paged.length)} من {formatNumber(filtered.length)} مورد
             </div>

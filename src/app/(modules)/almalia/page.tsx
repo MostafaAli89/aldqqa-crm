@@ -311,35 +311,35 @@ export default function Page() {
       </div>
 
       {/* Transactions Table */}
-      <div className="overflow-auto rounded-xl border border-border bg-card">
+      <div className="overflow-x-auto rounded-xl border border-border bg-card">
         <table className="w-full text-sm">
           <thead className="bg-muted text-muted-foreground">
             <tr>
-              <th className="p-3 text-right">رقم الفاتورة</th>
-              <th className="p-3 text-right">العميل</th>
-              <th className="p-3 text-right">المبلغ</th>
-              <th className="p-3 text-right">الحالة</th>
-              <th className="p-3 text-right">تاريخ الفاتورة</th>
-              <th className="p-3 text-right">تاريخ الاستحقاق</th>
-              <th className="p-3 text-right">إجراءات سريعة</th>
+              <th className="p-2 sm:p-3 text-right">رقم الفاتورة</th>
+              <th className="p-2 sm:p-3 text-right">العميل</th>
+              <th className="p-2 sm:p-3 text-right">المبلغ</th>
+              <th className="p-2 sm:p-3 text-right">الحالة</th>
+              <th className="p-2 sm:p-3 text-right">تاريخ الفاتورة</th>
+              <th className="p-2 sm:p-3 text-right">تاريخ الاستحقاق</th>
+              <th className="p-2 sm:p-3 text-right">إجراءات سريعة</th>
             </tr>
           </thead>
           <tbody>
             {currentPageItems.map((inv, i) => (
               <tr key={i} className="border-t border-border">
-                <td className="p-3">{inv.id}</td>
-                <td className="p-3">{inv.customer}</td>
-                <td className="p-3">{formatSAR(inv.amount)}</td>
-                <td className="p-3">
+                <td className="p-2 sm:p-3">{inv.id}</td>
+                <td className="p-2 sm:p-3">{inv.customer}</td>
+                <td className="p-2 sm:p-3">{formatSAR(inv.amount)}</td>
+                <td className="p-2 sm:p-3">
                   <span className={
                     inv.status === "مدفوع" ? "px-2 py-1 rounded bg-emerald-500/10 text-emerald-500" :
                     inv.status === "متأخر" || inv.status === "غير مدفوع" ? "px-2 py-1 rounded bg-rose-500/10 text-rose-500" :
                     "px-2 py-1 rounded bg-amber-500/10 text-amber-500"
                   }>{inv.status}</span>
                 </td>
-                <td className="p-3">{inv.invoiceDate}</td>
-                <td className="p-3">{inv.dueDate}</td>
-                <td className="p-3">
+                <td className="p-2 sm:p-3">{inv.invoiceDate}</td>
+                <td className="p-2 sm:p-3">{inv.dueDate}</td>
+                <td className="p-2 sm:p-3">
                   <div className="flex items-center gap-1.5">
                     <button
                       className="p-1.5 rounded-md border border-sky-400/40 text-sky-600 dark:text-sky-300 hover:bg-sky-500/10"

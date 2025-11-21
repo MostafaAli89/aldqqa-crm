@@ -244,6 +244,9 @@ export type InventoryItem = {
   leadTime: number; // وقت التوريد (أيام)
   supplierContact: string; // جهة اتصال المورد
   notes: string; // ملاحظات
+  // Notification preferences (optional)
+  expiryNotifyDays?: number; // days before expiry to notify
+  notifyMinUnits?: number; // minimum units left to trigger notification
 };
 
 // Base inventory items (50+ records with enhanced fields)

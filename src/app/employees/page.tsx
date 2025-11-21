@@ -246,36 +246,36 @@ export default function Page() {
         </div>
       ) : (
         <>
-          <div className="overflow-auto rounded-xl border border-border bg-card">
+          <div className="overflow-x-auto rounded-xl border border-border bg-card">
             <table className="w-full text-sm">
               <thead className="bg-muted text-muted-foreground">
                 <tr>
-                  <th className="p-3 text-right">الاسم</th>
-                  <th className="p-3 text-right">المسمى الوظيفي</th>
-                  <th className="p-3 text-right">القسم</th>
-                  <th className="p-3 text-right">تاريخ التعيين</th>
-                  <th className="p-3 text-right">الراتب الشهري</th>
-                  <th className="p-3 text-right">رصيد الإجازات</th>
-                  <th className="p-3 text-right">المدير المباشر</th>
-                  <th className="p-3 text-right">الحالة الوظيفية</th>
-                  <th className="p-3 text-right">KPIs</th>
-                  <th className="p-3 text-right">إجراءات سريعة</th>
+                  <th className="p-2 sm:p-3 text-right">الاسم</th>
+                  <th className="p-2 sm:p-3 text-right">المسمى الوظيفي</th>
+                  <th className="p-2 sm:p-3 text-right">القسم</th>
+                  <th className="p-2 sm:p-3 text-right">تاريخ التعيين</th>
+                  <th className="p-2 sm:p-3 text-right">الراتب الشهري</th>
+                  <th className="p-2 sm:p-3 text-right">رصيد الإجازات</th>
+                  <th className="p-2 sm:p-3 text-right">المدير المباشر</th>
+                  <th className="p-2 sm:p-3 text-right">الحالة الوظيفية</th>
+                  <th className="p-2 sm:p-3 text-right">KPIs</th>
+                  <th className="p-2 sm:p-3 text-right">إجراءات سريعة</th>
                 </tr>
               </thead>
               <tbody>
                 {paged.map((e, i) => (
                   <tr key={i} className="border-t border-border">
-                    <td className="p-3 font-medium">{e.name}</td>
-                    <td className="p-3">{e.title}</td>
-                    <td className="p-3">{e.department}</td>
-                    <td className="p-3">{e.joined}</td>
-                    <td className="p-3">{formatSAR(e.salary)}</td>
-                    <td className="p-3">{formatNumber(getLeaveBalance(e))} يوم</td>
-                    <td className="p-3">{getManager(e)}</td>
-                    <td className="p-3">
+                    <td className="p-2 sm:p-3 font-medium">{e.name}</td>
+                    <td className="p-2 sm:p-3">{e.title}</td>
+                    <td className="p-2 sm:p-3">{e.department}</td>
+                    <td className="p-2 sm:p-3">{e.joined}</td>
+                    <td className="p-2 sm:p-3">{formatSAR(e.salary)}</td>
+                    <td className="p-2 sm:p-3">{formatNumber(getLeaveBalance(e))} يوم</td>
+                    <td className="p-2 sm:p-3">{getManager(e)}</td>
+                    <td className="p-2 sm:p-3">
                       <span className={`px-2 py-1 text-[11px] rounded-md border ${e.status === "نشط" ? "bg-emerald-500/15 text-emerald-600 border-emerald-500/30" : "bg-amber-500/15 text-amber-600 border-amber-500/30"}`}>{e.status}</span>
                     </td>
-                    <td className="p-3">
+                    <td className="p-2 sm:p-3">
                       {(() => {
                         const k = getKpis(e);
                         return (
@@ -289,7 +289,7 @@ export default function Page() {
                         );
                       })()}
                     </td>
-                    <td className="p-3">
+                    <td className="p-2 sm:p-3">
                       <div className="flex items-center gap-2">
                         <button className="p-1.5 rounded-md border border-sky-400/40 text-sky-600 dark:text-sky-300 hover:bg-sky-500/10" onClick={() => { setSelected(e); setShowDetails(true); }} aria-label="عرض التفاصيل"><Eye size={16} /></button>
                         <button className="p-1.5 rounded-md border border-emerald-400/40 text-emerald-600 dark:text-emerald-300 hover:bg-emerald-500/10" onClick={() => { setEditingEmployee(e); }} aria-label="تعديل"><Pencil size={16} /></button>

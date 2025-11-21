@@ -1,16 +1,26 @@
 "use client";
 
 import { ThemeToggle } from "./ThemeToggle";
-import { Bell } from "lucide-react";
+import { Bell, Menu } from "lucide-react";
 import { useState } from "react";
 import { notifications } from "@/lib/mockData";
 import Image from "next/image";
 
-export function Header() {
+export function Header({ onOpenSidebar }: { onOpenSidebar?: () => void }) {
   const [open, setOpen] = useState(false);
   return (
-    <header className="col-span-2 h-16 px-6 flex items-center justify-between border-b border-border bg-card/60 backdrop-blur">
-      <div className="flex items-center gap-4">
+    <header className="col-span-2 h-16 px-4 md:px-6 flex items-center justify-between border-b border-border bg-card/60 backdrop-blur">
+      <div className="flex items-center gap-3">
+        {/* Hamburger for mobile */}
+        <button
+          onClick={() => onOpenSidebar && onOpenSidebar()}
+          className="p-2 rounded-md border border-border bg-card hover:bg-muted transition md:hidden"
+          aria-label="فتح القائمة" 
+          title="فتح القائمة"
+        >
+          <Menu size={18} />
+        </button>
+
         <div className="relative w-14 h-14 md:w-16 md:h-16 rounded-lg overflow-hidden border border-border bg-gradient-to-br from-white/5 to-black/[0.02] dark:from-white/[0.04] dark:to-black/[0.02] shadow-sm">
           <Image
             src="/d-logo404.png.jpg"
@@ -21,7 +31,7 @@ export function Header() {
             priority
           />
         </div>
-        <div>
+        <div className="hidden sm:block">
           <div className="text-xl md:text-2xl font-bold leading-tight text-gradient bg-gradient-to-r from-blue-600 to-emerald-600 dark:from-blue-400 dark:to-emerald-400">الدقة والتحكم</div>
           <div className="text-sm text-muted-foreground">نظام إدارة متكامل</div>
         </div>

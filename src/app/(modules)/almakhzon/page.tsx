@@ -200,6 +200,15 @@ export default function Page() {
     setPage(1);
   }, [selectedCategory, selectedBranch, searchQuery]);
 
+  // Alerts for expiry notifications and unit-based notifications
+  const expiryAlerts = useMemo(() => {
+    return items.filter(item => typeof item.expiryNotifyDays === 'number' && item.daysToExpiry <= (item.expiryNotifyDays ?? 0));
+  }, [items]);
+
+  const unitsAlerts = useMemo(() => {
+    return items.filter(item => typeof item.notifyMinUnits === 'number' && item.currentStock <= (item.notifyMinUnits ?? 0));
+  }, [items]);
+
   const uniqueBranches = useMemo(() => {
     const branches = new Set(items.map(item => item.branch));
     return Array.from(branches);
@@ -414,6 +423,47 @@ export default function Page() {
             )}
           </div>
         </div>
+
+          {/* Notification Alerts (Expiry / Low Units) */}
+          {(expiryAlerts.length > 0 || unitsAlerts.length > 0) && (
+            <div className="rounded-xl border border-rose-300 bg-rose-50 p-4">
+              <div className="flex items-start justify-between">
+                <div>
+                  <h3 className="text-lg font-semibold text-rose-700">تنبيهات المخزون</h3>
+                  <p className="text-sm text-rose-600">هناك بعض الأصناف التي تطابق قواعد الإشعار الخاصة بك.</p>
+                </div>
+                <div className="text-sm text-rose-700 font-semibold">{expiryAlerts.length + unitsAlerts.length} تنبيه</div>
+              </div>
+
+              <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3">
+                {expiryAlerts.length > 0 && (
+                  <div className="rounded-md border border-rose-200 bg-rose-50 p-3">
+                    <div className="font-medium text-rose-700 mb-2">قريب من تاريخ الانتهاء</div>
+                    <ul className="list-disc list-inside text-sm text-rose-700">
+                      {expiryAlerts.map((it) => (
+                        <li key={it.id}>
+                          {it.product} — ينتهي خلال {it.daysToExpiry} يوم{it.daysToExpiry !== 1 ? "" : ""} ({it.expiry})
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {unitsAlerts.length > 0 && (
+                  <div className="rounded-md border border-amber-200 bg-amber-50 p-3">
+                    <div className="font-medium text-amber-700 mb-2">كمية منخفضة</div>
+                    <ul className="list-disc list-inside text-sm text-amber-700">
+                      {unitsAlerts.map((it) => (
+                        <li key={it.id}>
+                          {it.product} — المتبقي {formatNumber(it.currentStock)} وحدة (حد التنبيه {it.notifyMinUnits})
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredCategories.map((category, index) => (
@@ -484,47 +534,47 @@ export default function Page() {
           </div>
         </div>
         
-        <div className="overflow-auto">
+        <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-muted text-muted-foreground">
               <tr>
-                <th className="p-3 text-right">المنتج</th>
-                <th className="p-3 text-right">المخزن/الموقع</th>
-                <th className="p-3 text-right">المخزون الحالي</th>
-                <th className="p-3 text-right">نقطة إعادة التوريد</th>
-                <th className="p-3 text-right">الكمية المطلوبة</th>
-                <th className="p-3 text-right">المورد المفضل</th>
-                <th className="p-3 text-right">الحالة</th>
-                <th className="p-3 text-right">الإجراء</th>
+                <th className="p-2 sm:p-3 text-right">المنتج</th>
+                <th className="p-2 sm:p-3 text-right">المخزن/الموقع</th>
+                <th className="p-2 sm:p-3 text-right">المخزون الحالي</th>
+                <th className="p-2 sm:p-3 text-right">نقطة إعادة التوريد</th>
+                <th className="p-2 sm:p-3 text-right">الكمية المطلوبة</th>
+                <th className="p-2 sm:p-3 text-right">المورد المفضل</th>
+                <th className="p-2 sm:p-3 text-right">الحالة</th>
+                <th className="p-2 sm:p-3 text-right">الإجراء</th>
               </tr>
             </thead>
             <tbody>
               {urgentReorderItems.map((item, index) => (
                 <tr key={index} className="border-t border-border hover:bg-muted/50">
-                  <td className="p-3">
+                  <td className="p-2 sm:p-3">
                     <div>
                       <div className="font-medium">{item.product}</div>
                       <div className="text-xs text-muted-foreground">{item.id}</div>
                     </div>
                   </td>
-                  <td className="p-3">
+                  <td className="p-2 sm:p-3">
                     <div>
                       <div className="font-medium">{item.branch}</div>
                       <div className="text-xs text-muted-foreground">دفعة: {item.batch}</div>
                     </div>
                   </td>
-                  <td className="p-3">
+                  <td className="p-2 sm:p-3">
                     <div className="text-center">
                       <div className="font-semibold text-rose-500">{formatNumber(item.currentStock)}</div>
                       <div className="text-xs text-muted-foreground">من {formatNumber(item.maxStock)}</div>
                     </div>
                   </td>
-                  <td className="p-3">
+                  <td className="p-2 sm:p-3">
                     <div className="text-center">
                       <div className="font-semibold">{formatNumber(item.reorderPoint)}</div>
                     </div>
                   </td>
-                  <td className="p-3">
+                  <td className="p-2 sm:p-3">
                     <div className="text-center">
                       <div className="font-semibold text-emerald-500">
                         {formatNumber(item.maxStock - item.currentStock)}
@@ -534,18 +584,18 @@ export default function Page() {
                       </div>
                     </div>
                   </td>
-                  <td className="p-3">
+                  <td className="p-2 sm:p-3">
                     <div className="flex items-center gap-2">
                       <Truck size={14} className="text-muted-foreground" />
                       <span className="text-sm">{item.supplier}</span>
                     </div>
                   </td>
-                  <td className="p-3">
+                  <td className="p-2 sm:p-3">
                     <span className={`px-2 py-1 text-[11px] rounded-md border ${statusTag(item.status)}`}>
                       {item.status}
                     </span>
                   </td>
-                  <td className="p-3">
+                  <td className="p-2 sm:p-3">
                     <button className="px-3 py-1.5 rounded-md border border-emerald-500 bg-emerald-500 text-white text-xs hover:bg-emerald-600 transition-colors">
                       إنشاء أمر شراء
                     </button>
@@ -578,82 +628,82 @@ export default function Page() {
           </div>
         </div>
         
-        <div className="overflow-auto">
+        <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-muted text-muted-foreground">
               <tr>
-                <th className="p-3 text-right">اسم المنتج</th>
-                <th className="p-3 text-right">الفئة</th>
-                <th className="p-3 text-right">رمز الصنف</th>
-                <th className="p-3 text-right">المخزن/الموقع</th>
-                <th className="p-3 text-right">الكمية الحالية</th>
-                <th className="p-3 text-right">نقطة إعادة الطلب</th>
-                <th className="p-3 text-right">المورد الأساسي</th>
-                <th className="p-3 text-right">تاريخ آخر حركة</th>
-                <th className="p-3 text-right">متوسط التكلفة</th>
-                <th className="p-3 text-right">سعر البيع</th>
-                <th className="p-3 text-right">الحالة</th>
-                <th className="p-3 text-right">الإجراء</th>
+                <th className="p-2 sm:p-3 text-right">اسم المنتج</th>
+                <th className="p-2 sm:p-3 text-right">الفئة</th>
+                <th className="p-2 sm:p-3 text-right">رمز الصنف</th>
+                <th className="p-2 sm:p-3 text-right">المخزن/الموقع</th>
+                <th className="p-2 sm:p-3 text-right">الكمية الحالية</th>
+                <th className="p-2 sm:p-3 text-right">نقطة إعادة الطلب</th>
+                <th className="p-2 sm:p-3 text-right">المورد الأساسي</th>
+                <th className="p-2 sm:p-3 text-right">تاريخ آخر حركة</th>
+                <th className="p-2 sm:p-3 text-right">متوسط التكلفة</th>
+                <th className="p-2 sm:p-3 text-right">سعر البيع</th>
+                <th className="p-2 sm:p-3 text-right">الحالة</th>
+                <th className="p-2 sm:p-3 text-right">الإجراء</th>
               </tr>
             </thead>
             <tbody>
               {pagedInventory.map((item, index) => (
                 <tr key={index} className="border-t border-border hover:bg-muted/50">
-                  <td className="p-3">
+                  <td className="p-2 sm:p-3">
                     <div>
                       <div className="font-medium">{item.product}</div>
                     </div>
                   </td>
-                  <td className="p-3">
+                  <td className="p-2 sm:p-3">
                     <span className="px-2 py-1 text-[11px] rounded-md border bg-secondary/30 border-border">
                       {item.category}
                     </span>
                   </td>
-                  <td className="p-3">
+                  <td className="p-2 sm:p-3">
                     <div>
                       <div className="font-mono text-xs">{item.sku}</div>
                       <div className="text-xs text-muted-foreground">{item.barcode}</div>
                     </div>
                   </td>
-                  <td className="p-3">
+                  <td className="p-2 sm:p-3">
                     <div>
                       <div className="font-medium">{item.warehouse}</div>
                       <div className="text-xs text-muted-foreground">{item.bin}</div>
                     </div>
                   </td>
-                  <td className="p-3">
+                  <td className="p-2 sm:p-3">
                     <div className="text-center">
                       <div className="font-semibold">{formatNumber(item.currentStock)}</div>
                       <div className="text-xs text-muted-foreground">من {formatNumber(item.maxStock)}</div>
                     </div>
                   </td>
-                  <td className="p-3">
+                  <td className="p-2 sm:p-3">
                     <div className="text-center">
                       <div className="font-semibold">{formatNumber(item.reorderPoint)}</div>
                     </div>
                   </td>
-                  <td className="p-3">
+                  <td className="p-2 sm:p-3">
                     <div>
                       <div className="font-medium">{item.supplier}</div>
                       <div className="text-xs text-muted-foreground">{item.supplierContact}</div>
                     </div>
                   </td>
-                  <td className="p-3">
+                  <td className="p-2 sm:p-3">
                     <div className="text-center">
                       <div className="font-medium">{item.lastMovement}</div>
                     </div>
                   </td>
-                  <td className="p-3">
+                  <td className="p-2 sm:p-3">
                     <div className="text-center">
                       <div className="font-semibold">{formatSAR(item.avgCost)}</div>
                     </div>
                   </td>
-                  <td className="p-3">
+                  <td className="p-2 sm:p-3">
                     <div className="text-center">
                       <div className="font-semibold text-emerald-600 dark:text-emerald-400">{formatSAR(item.sellingPrice)}</div>
                     </div>
                   </td>
-                  <td className="p-3">
+                  <td className="p-2 sm:p-3">
                     <div className="flex flex-col gap-1">
                       <span className={`px-2 py-1 text-[10px] rounded-md border ${statusTag(item.status)}`}>
                         {item.status}
@@ -663,7 +713,7 @@ export default function Page() {
                       </span>
                     </div>
                   </td>
-                  <td className="p-3">
+                  <td className="p-2 sm:p-3">
                     <div className="flex items-center gap-2">
                       <button
                         className="p-1.5 rounded-md border border-blue-400/40 text-blue-600 dark:text-blue-300 hover:bg-blue-500/10"
@@ -944,43 +994,43 @@ export default function Page() {
               <div className="p-4 border-b border-border">
                 <h3 className="text-lg font-semibold">تاريخ الحركات (آخر 5 حركات)</h3>
               </div>
-              <div className="overflow-auto">
-                <table className="w-full text-sm">
-                  <thead className="bg-muted text-muted-foreground">
-                    <tr>
-                      <th className="p-3 text-right">التاريخ</th>
-                      <th className="p-3 text-right">نوع الحركة</th>
-                      <th className="p-3 text-right">الكمية</th>
-                      <th className="p-3 text-right">المستخدم</th>
-                      <th className="p-3 text-right">المرجع</th>
-                      <th className="p-3 text-right">ملاحظات</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {inventoryMovements
-                      .filter(movement => movement.productId === selectedProduct.id)
-                      .slice(0, 5)
-                      .map((movement, index) => (
-                        <tr key={index} className="border-t border-border">
-                          <td className="p-3">{movement.date}</td>
-                          <td className="p-3">
-                            <span className={`px-2 py-1 text-[10px] rounded-md border ${movementTypeTag(movement.type)}`}>
-                              {movement.type}
-                            </span>
-                          </td>
-                          <td className="p-3">
-                            <span className={movement.quantity > 0 ? "text-emerald-600" : "text-rose-600"}>
-                              {movement.quantity > 0 ? "+" : ""}{formatNumber(movement.quantity)}
-                            </span>
-                          </td>
-                          <td className="p-3">{movement.user}</td>
-                          <td className="p-3 font-mono text-xs">{movement.reference}</td>
-                          <td className="p-3">{movement.notes}</td>
-                        </tr>
-                      ))}
-                  </tbody>
-                </table>
-              </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead className="bg-muted text-muted-foreground">
+                      <tr>
+                        <th className="p-2 sm:p-3 text-right">التاريخ</th>
+                        <th className="p-2 sm:p-3 text-right">نوع الحركة</th>
+                        <th className="p-2 sm:p-3 text-right">الكمية</th>
+                        <th className="p-2 sm:p-3 text-right">المستخدم</th>
+                        <th className="p-2 sm:p-3 text-right">المرجع</th>
+                        <th className="p-2 sm:p-3 text-right">ملاحظات</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {inventoryMovements
+                        .filter(movement => movement.productId === selectedProduct.id)
+                        .slice(0, 5)
+                        .map((movement, index) => (
+                          <tr key={index} className="border-t border-border">
+                            <td className="p-2 sm:p-3">{movement.date}</td>
+                            <td className="p-2 sm:p-3">
+                              <span className={`px-2 py-1 text-[10px] rounded-md border ${movementTypeTag(movement.type)}`}>
+                                {movement.type}
+                              </span>
+                            </td>
+                            <td className="p-2 sm:p-3">
+                              <span className={movement.quantity > 0 ? "text-emerald-600" : "text-rose-600"}>
+                                {movement.quantity > 0 ? "+" : ""}{formatNumber(movement.quantity)}
+                              </span>
+                            </td>
+                            <td className="p-2 sm:p-3">{movement.user}</td>
+                            <td className="p-2 sm:p-3 font-mono text-xs">{movement.reference}</td>
+                            <td className="p-2 sm:p-3">{movement.notes}</td>
+                          </tr>
+                        ))}
+                    </tbody>
+                  </table>
+                </div>
             </div>
 
             {/* Notes */}
@@ -1165,20 +1215,59 @@ export default function Page() {
             <form onSubmit={(e) => {
               e.preventDefault();
               const formData = new FormData(e.currentTarget);
+              const product = String(formData.get("product") || "");
+              const sku = String(formData.get("sku") || "");
+              const category = String(formData.get("category") || "مستهلكات طبية") as InventoryItem["category"];
+              const supplier = String(formData.get("supplier") || "");
+              const sellingPrice = parseFloat(String(formData.get("sellingPrice") || "0")) || 0;
+              const avgCost = parseFloat(String(formData.get("avgCost") || "0")) || 0;
+              const reorderPoint = parseInt(String(formData.get("reorderPoint") || "0")) || 0;
+              const initialQuantity = parseInt(String(formData.get("initialQuantity") || "0")) || 0;
+              const barcode = String(formData.get("barcode") || "");
+              const notes = String(formData.get("notes") || "");
+              const expiry = String(formData.get("expiry") || "");
+              const expiryNotifyDays = parseInt(String(formData.get("expiryNotifyDays") || "0")) || undefined;
+              const notifyMinUnits = parseInt(String(formData.get("notifyMinUnits") || "0")) || undefined;
+
+              const todayStr = new Date().toISOString().slice(0,10);
+              const id = `INV-${Date.now()}`;
+
               const newItem = {
-                product: formData.get("product"),
-                sku: formData.get("sku"),
-                category: formData.get("category"),
-                supplier: formData.get("supplier"),
-                sellingPrice: formData.get("sellingPrice"),
-                avgCost: formData.get("avgCost"),
-                reorderPoint: formData.get("reorderPoint"),
-                defaultLocation: formData.get("defaultLocation"),
-                initialQuantity: formData.get("initialQuantity"),
-                barcode: formData.get("barcode"),
-                notes: formData.get("notes")
+                id,
+                product,
+                category,
+                batch: "",
+                expiry: expiry || todayStr,
+                currentStock: initialQuantity,
+                reorderPoint,
+                maxStock: Math.max(initialQuantity, reorderPoint * 2, 100),
+                unitCost: avgCost,
+                branch: "الرياض",
+                lastRestocked: todayStr,
+                supplier,
+                critical: false,
+                sku,
+                barcode,
+                warehouse: String(formData.get("defaultLocation") || "المخزن العام"),
+                bin: "",
+                lastMovement: todayStr,
+                avgCost,
+                sellingPrice,
+                condition: "سليم",
+                minOrderQty: parseInt(String(formData.get("minOrderQty") || "0")) || 0,
+                leadTime: 7,
+                supplierContact: "",
+                notes,
+                daysToExpiry: expiry ? Math.ceil((new Date(expiry).getTime() - new Date().getTime())/(1000*60*60*24)) : 0,
+                stockPercentage: Math.round((initialQuantity / (Math.max(initialQuantity, reorderPoint * 2, 100))) * 100),
+                slowMoving: false,
+                status: initialQuantity === 0 ? "نفد" : (initialQuantity <= reorderPoint ? "منخفض" : "متوفر"),
+                // notification prefs
+                expiryNotifyDays: expiryNotifyDays as number | undefined,
+                notifyMinUnits: notifyMinUnits as number | undefined,
               };
-              console.log("New Item Data:", newItem);
+
+              setItems(prev => [newItem as InventoryItem, ...prev]);
               setShowAddItemModal(false);
             }} className="space-y-6">
               
@@ -1281,6 +1370,39 @@ export default function Page() {
                       min="0"
                       className="w-full px-3 py-2 rounded-md border border-border bg-input text-sm" 
                       required 
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="expiry" className="block text-sm font-medium text-foreground mb-1">تاريخ انتهاء الصلاحية</label>
+                    <input
+                      type="date"
+                      id="expiry"
+                      name="expiry"
+                      className="w-full px-3 py-2 rounded-md border border-border bg-input text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="expiryNotifyDays" className="block text-sm font-medium text-foreground mb-1">تنبيه قبل انتهاء الصلاحية (يوم)</label>
+                    <select
+                      id="expiryNotifyDays"
+                      name="expiryNotifyDays"
+                      className="w-full px-3 py-2 rounded-md border border-border bg-input text-sm"
+                    >
+                      <option value="">لا يوجد</option>
+                      <option value="30">30</option>
+                      <option value="50">50</option>
+                      <option value="70">70</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label htmlFor="notifyMinUnits" className="block text-sm font-medium text-foreground mb-1">تنبيه عند توفر وحدات أقل من (وحدة)</label>
+                    <input
+                      type="number"
+                      id="notifyMinUnits"
+                      name="notifyMinUnits"
+                      min="0"
+                      className="w-full px-3 py-2 rounded-md border border-border bg-input text-sm"
+                      placeholder="مثال: 50"
                     />
                   </div>
                   <div>

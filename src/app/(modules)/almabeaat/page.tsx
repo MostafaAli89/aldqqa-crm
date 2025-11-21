@@ -569,25 +569,25 @@ export default function Page() {
             الطلبات الأخيرة
           </h3>
         </div>
-        <div className="overflow-auto">
+        <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-muted text-muted-foreground">
               <tr>
-                <th className="p-3 text-right">رقم الطلبية</th>
-                <th className="p-3 text-right">العميل</th>
-                <th className="p-3 text-right">مندوب المبيعات</th>
-                <th className="p-3 text-right">الحالة</th>
-                <th className="p-3 text-right">المبلغ</th>
-                <th className="p-3 text-right">هامش الربح</th>
-                <th className="p-3 text-right">تاريخ الطلب</th>
-                <th className="p-3 text-right">إجراءات</th>
+                <th className="p-2 sm:p-3 text-right">رقم الطلبية</th>
+                <th className="p-2 sm:p-3 text-right">العميل</th>
+                <th className="p-2 sm:p-3 text-right">مندوب المبيعات</th>
+                <th className="p-2 sm:p-3 text-right">الحالة</th>
+                <th className="p-2 sm:p-3 text-right">المبلغ</th>
+                <th className="p-2 sm:p-3 text-right">هامش الربح</th>
+                <th className="p-2 sm:p-3 text-right">تاريخ الطلب</th>
+                <th className="p-2 sm:p-3 text-right">إجراءات</th>
               </tr>
             </thead>
             <tbody>
               {filteredOrders.slice(0, 10).map((order, i) => (
                 <tr key={i} className="border-t border-border">
-                  <td className="p-3 font-mono text-xs">{order.id}</td>
-                  <td className="p-3">
+                  <td className="p-2 sm:p-3 font-mono text-xs">{order.id}</td>
+                  <td className="p-2 sm:p-3">
                     <div>
                       <div className="font-medium">{order.customer}</div>
                       <span className={`px-2 py-1 text-[10px] rounded-md border ${classificationTag(order.customerClassification)}`}>
@@ -595,21 +595,21 @@ export default function Page() {
                       </span>
                     </div>
                   </td>
-                  <td className="p-3">{order.salesRep}</td>
-                  <td className="p-3">
+                  <td className="p-2 sm:p-3">{order.salesRep}</td>
+                  <td className="p-2 sm:p-3">
                     <span className={`px-2 py-1 text-[11px] rounded-md border ${statusTag(order.status)}`}>
                       {order.status}
                     </span>
                   </td>
-                  <td className="p-3 font-semibold">{formatSAR(order.total)}</td>
-                  <td className="p-3">
+                  <td className="p-2 sm:p-3 font-semibold">{formatSAR(order.total)}</td>
+                  <td className="p-2 sm:p-3">
                     <div className="flex items-center gap-1">
                       <span className="text-emerald-500 font-semibold">{(order.profitMargin * 100).toFixed(1)}%</span>
                       <span className="text-xs text-muted-foreground">({formatSAR(order.total * order.profitMargin)})</span>
                     </div>
                   </td>
-                  <td className="p-3">{order.orderDate}</td>
-                  <td className="p-3">
+                  <td className="p-2 sm:p-3">{order.orderDate}</td>
+                  <td className="p-2 sm:p-3">
                     <div className="flex items-center gap-2">
                       <button
                         className="p-1.5 rounded-md border border-sky-400/40 text-sky-600 dark:text-sky-300 hover:bg-sky-500/10"
@@ -733,14 +733,14 @@ export default function Page() {
               <div className="p-4 border-b border-border">
                 <h3 className="text-lg font-semibold">أصناف الطلبية</h3>
               </div>
-              <div className="overflow-auto">
+              <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead className="bg-muted text-muted-foreground">
                     <tr>
-                      <th className="p-3 text-right">المنتج</th>
-                      <th className="p-3 text-right">الكمية</th>
-                      <th className="p-3 text-right">سعر الوحدة</th>
-                      <th className="p-3 text-right">الإجمالي</th>
+                      <th className="p-2 sm:p-3 text-right">المنتج</th>
+                      <th className="p-2 sm:p-3 text-right">الكمية</th>
+                      <th className="p-2 sm:p-3 text-right">سعر الوحدة</th>
+                      <th className="p-2 sm:p-3 text-right">الإجمالي</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -757,18 +757,18 @@ export default function Page() {
                       
                       return (
                         <tr key={i} className="border-t border-border">
-                          <td className="p-3 font-medium">{product}</td>
-                          <td className="p-3">{formatNumber(quantity)}</td>
-                          <td className="p-3">{formatSAR(unitPrice)}</td>
-                          <td className="p-3 font-semibold">{formatSAR(total)}</td>
+                          <td className="p-2 sm:p-3 font-medium">{product}</td>
+                          <td className="p-2 sm:p-3">{formatNumber(quantity)}</td>
+                          <td className="p-2 sm:p-3">{formatSAR(unitPrice)}</td>
+                          <td className="p-2 sm:p-3 font-semibold">{formatSAR(total)}</td>
                         </tr>
                       );
                     })}
                   </tbody>
                   <tfoot className="bg-muted/50">
                     <tr>
-                      <td colSpan={3} className="p-3 text-right font-semibold">الإجمالي</td>
-                      <td className="p-3 font-bold text-lg text-primary">{formatSAR(selectedOrder.total)}</td>
+                      <td colSpan={3} className="p-2 sm:p-3 text-right font-semibold">الإجمالي</td>
+                      <td className="p-2 sm:p-3 font-bold text-lg text-primary">{formatSAR(selectedOrder.total)}</td>
                     </tr>
                   </tfoot>
                 </table>
@@ -1185,14 +1185,14 @@ export default function Page() {
               <div className="p-4 border-b border-border">
                 <h3 className="text-lg font-semibold">أصناف الفاتورة</h3>
               </div>
-              <div className="overflow-auto">
+              <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead className="bg-muted text-muted-foreground">
                     <tr>
-                      <th className="p-3 text-right">المنتج</th>
-                      <th className="p-3 text-right">الكمية</th>
-                      <th className="p-3 text-right">سعر الوحدة</th>
-                      <th className="p-3 text-right">الإجمالي</th>
+                      <th className="p-2 sm:p-3 text-right">المنتج</th>
+                      <th className="p-2 sm:p-3 text-right">الكمية</th>
+                      <th className="p-2 sm:p-3 text-right">سعر الوحدة</th>
+                      <th className="p-2 sm:p-3 text-right">الإجمالي</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -1209,18 +1209,18 @@ export default function Page() {
                       
                       return (
                         <tr key={i} className="border-t border-border">
-                          <td className="p-3 font-medium">{product}</td>
-                          <td className="p-3">{formatNumber(quantity)}</td>
-                          <td className="p-3">{formatSAR(unitPrice)}</td>
-                          <td className="p-3 font-semibold">{formatSAR(total)}</td>
+                          <td className="p-2 sm:p-3 font-medium">{product}</td>
+                          <td className="p-2 sm:p-3">{formatNumber(quantity)}</td>
+                          <td className="p-2 sm:p-3">{formatSAR(unitPrice)}</td>
+                          <td className="p-2 sm:p-3 font-semibold">{formatSAR(total)}</td>
                         </tr>
                       );
                     })}
                   </tbody>
                   <tfoot className="bg-muted/50">
                     <tr>
-                      <td colSpan={3} className="p-3 text-right font-semibold">الإجمالي</td>
-                      <td className="p-3 font-bold text-lg text-primary">{formatSAR(selectedInvoice.amount)}</td>
+                      <td colSpan={3} className="p-2 sm:p-3 text-right font-semibold">الإجمالي</td>
+                      <td className="p-2 sm:p-3 font-bold text-lg text-primary">{formatSAR(selectedInvoice.amount)}</td>
                     </tr>
                   </tfoot>
                 </table>

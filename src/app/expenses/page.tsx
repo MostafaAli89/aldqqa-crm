@@ -279,29 +279,29 @@ export default function Page() {
       </div>
 
       {/* Transactions Table */}
-      <div className="overflow-auto rounded-xl border border-border bg-card">
+      <div className="overflow-x-auto rounded-xl border border-border bg-card">
         <table className="w-full text-sm">
           <thead className="bg-muted text-muted-foreground">
             <tr>
-              <th className="p-3 text-right">رقم المصروف</th>
-              <th className="p-3 text-right">الوصف</th>
-              <th className="p-3 text-right">الفئة</th>
-              <th className="p-3 text-right">المبلغ</th>
-              <th className="p-3 text-right">الحالة</th>
-              <th className="p-3 text-right">تاريخ المصروف</th>
-              <th className="p-3 text-right">تاريخ الاستحقاق</th>
-              <th className="p-3 text-right">المورد</th>
-              <th className="p-3 text-right">إجراءات سريعة</th>
+              <th className="p-2 sm:p-3 text-right">رقم المصروف</th>
+              <th className="p-2 sm:p-3 text-right">الوصف</th>
+              <th className="p-2 sm:p-3 text-right">الفئة</th>
+              <th className="p-2 sm:p-3 text-right">المبلغ</th>
+              <th className="p-2 sm:p-3 text-right">الحالة</th>
+              <th className="p-2 sm:p-3 text-right">تاريخ المصروف</th>
+              <th className="p-2 sm:p-3 text-right">تاريخ الاستحقاق</th>
+              <th className="p-2 sm:p-3 text-right">المورد</th>
+              <th className="p-2 sm:p-3 text-right">إجراءات سريعة</th>
             </tr>
           </thead>
           <tbody>
             {currentPageItems.map((exp, i) => (
               <tr key={i} className="border-t border-border">
-                <td className="p-3">{exp.id}</td>
-                <td className="p-3">{exp.description}</td>
-                <td className="p-3">{exp.category}</td>
-                <td className="p-3">{formatSAR(exp.amount)}</td>
-                <td className="p-3">
+                <td className="p-2 sm:p-3">{exp.id}</td>
+                <td className="p-2 sm:p-3">{exp.description}</td>
+                <td className="p-2 sm:p-3">{exp.category}</td>
+                <td className="p-2 sm:p-3">{formatSAR(exp.amount)}</td>
+                <td className="p-2 sm:p-3">
                   <span className={
                     exp.status === "مدفوع" ? "px-2 py-1 rounded bg-green-500/10 text-green-500" :
                     exp.status === "مستحق" ? "px-2 py-1 rounded bg-blue-500/10 text-blue-500" :
